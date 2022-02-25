@@ -35,18 +35,16 @@ func HideInfo(originalFileName, secretText, result string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println([]byte(secretText))
+
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 
 	prepImg := NewPixelColorsFromImage(img, width, height)
 	prepImg.NullifyLSB()
 
 	sb := strings.Builder{}
-	for _, b := range []byte(secretText) {
-		sb.WriteString(fmt.Sprintf("%.08b", b))
+	for _, b := range []rune(secretText) {
+		sb.WriteString(fmt.Sprintf("%.016b", b))
 	}
-
-	log.Println(sb.String())
 
 	var n int
 	for _, sym := range sb.String() {

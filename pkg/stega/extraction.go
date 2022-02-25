@@ -1,7 +1,6 @@
 package stega
 
 import (
-	"bytes"
 	"image"
 	"log"
 	"os"
@@ -55,13 +54,14 @@ func extractSecretInfoBitString(limit int, pc1, pc2 PixelColors) string {
 }
 
 func extractInfo(bitString string) string {
-	var bb bytes.Buffer
-	log.Println(bitString)
-	for i := 0; i < len(bitString)/8; i++ {
-		sub := bitString[i*8 : i*8+8]
-		intSub, _ := strconv.ParseInt(sub, 2, 8)
-		bb.WriteByte(byte(intSub))
+	var sb strings.Builder
+
+	for i := 0; i < len(bitString)/16; i++ {
+		sub := bitString[i*16 : i*16+16]
+		intSub, _ := strconv.ParseUint(sub, 2, 32)
+		r := rune(intSub)
+		sb.WriteRune(r)
 	}
 
-	return bb.String()
+	return sb.String()
 }
