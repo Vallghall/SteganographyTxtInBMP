@@ -18,8 +18,8 @@ type PixelColors struct {
 	Colors []color.NRGBA
 }
 
-func (pc *PixelColors) NullifyLSB() {
-	for i := range pc.Colors {
+func (pc *PixelColors) NullifyLSB(bits int) {
+	for i := 0; i < bits; i++ {
 		pc.Colors[i].B &= ^uint8(1)
 	}
 }
@@ -39,7 +39,7 @@ func HideInfo(originalFileName, secretText, result string) {
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 
 	prepImg := NewPixelColorsFromImage(img, width, height)
-	prepImg.NullifyLSB()
+	prepImg.NullifyLSB(len(secretText) * 16)
 
 	sb := strings.Builder{}
 	for _, b := range []rune(secretText) {
@@ -48,6 +48,9 @@ func HideInfo(originalFileName, secretText, result string) {
 
 	var n int
 	for _, sym := range sb.String() {
+		if n == len(secretText)*16 {
+			break
+		}
 		if sym == '1' {
 			prepImg.Colors[n].B += 1
 		}

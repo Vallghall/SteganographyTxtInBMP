@@ -7,12 +7,12 @@ import (
 
 const (
 	originalFileName = "oberon.bmp"
-	secretText       = "Русский"
+	secretText       = "Vali"
 	result           = "encoded.bmp"
 )
 
 func main() {
 	stega.HideInfo(originalFileName, secretText, result)
 
-	fmt.Println(stega.ExtractLSBInfo(len(secretText)*16, originalFileName, result))
+	fmt.Println(stega.ExtractLSBInfo(len(secretText), originalFileName, result))
 }

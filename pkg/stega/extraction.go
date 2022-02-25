@@ -33,10 +33,10 @@ func ExtractLSBInfo(infoLength int, original, result string) string {
 	}
 
 	pc1 := NewPixelColorsFromImage(originalImg, oWidth, oHeight)
-	pc1.NullifyLSB()
+	pc1.NullifyLSB(infoLength * 16)
 	pc2 := NewPixelColorsFromImage(resultImg, rWidth, rHeight)
 
-	bs := extractSecretInfoBitString(infoLength, pc1, pc2)
+	bs := extractSecretInfoBitString(infoLength*16, pc1, pc2)
 
 	return extractInfo(bs)
 }
