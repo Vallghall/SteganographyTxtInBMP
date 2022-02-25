@@ -10,19 +10,21 @@ import (
 	"strings"
 )
 
+func init() {
+	image.RegisterFormat("bmp", "bmp", bmp.Decode, bmp.DecodeConfig)
+}
+
 type PixelColors struct {
-	Colors []color.RGBA64
+	Colors []color.NRGBA
 }
 
 func (pc *PixelColors) NullifyLSB() {
 	for i := range pc.Colors {
-		pc.Colors[i].B &= ^uint16(1)
+		pc.Colors[i].B &= ^uint8(1)
 	}
 }
 
 func HideInfo(originalFileName, secretText, result string) {
-	image.RegisterFormat("bmp", "bmp", bmp.Decode, bmp.DecodeConfig)
-
 	f, err := os.Open(originalFileName)
 	if err != nil {
 		log.Fatalln("error:", err)
@@ -33,7 +35,7 @@ func HideInfo(originalFileName, secretText, result string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	log.Println([]byte(secretText))
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 
 	prepImg := NewPixelColorsFromImage(img, width, height)
@@ -44,10 +46,14 @@ func HideInfo(originalFileName, secretText, result string) {
 		sb.WriteString(fmt.Sprintf("%.08b", b))
 	}
 
-	for i, sym := range sb.String() {
+	log.Println(sb.String())
+
+	var n int
+	for _, sym := range sb.String() {
 		if sym == '1' {
-			prepImg.Colors[i].B |= 1
+			prepImg.Colors[n].B += 1
 		}
+		n++
 	}
 
 	out := image.NewNRGBA(image.Rectangle{
@@ -71,11 +77,11 @@ func NewPixelColorsFromImage(img image.Image, width, height int) (pc PixelColors
 	for i := 0; i < width; i++ {
 		for j := 0; j < height; j++ {
 			r, g, b, a := img.At(i, j).RGBA()
-			pc.Colors = append(pc.Colors, color.RGBA64{
-				R: uint16(r),
-				G: uint16(g),
-				B: uint16(b),
-				A: uint16(a),
+			pc.Colors = append(pc.Colors, color.NRGBA{
+				R: uint8(r),
+				G: uint8(g),
+				B: uint8(b),
+				A: uint8(a),
 			})
 		}
 	}

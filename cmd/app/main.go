@@ -1,14 +1,18 @@
 package main
 
-import "stega/pkg/stega"
+import (
+	"fmt"
+	"stega/pkg/stega"
+)
 
 const (
 	originalFileName = "oberon.bmp"
-	secretText       = "ГусевРоманМихайлович"
+	secretText       = "Vali"
 	result           = "encoded.bmp"
 )
 
 func main() {
 	stega.HideInfo(originalFileName, secretText, result)
 
+	fmt.Println(stega.ExtractLSBInfo(len(secretText)*8, originalFileName, result))
 }
