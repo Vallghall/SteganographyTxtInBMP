@@ -8,24 +8,16 @@ import (
 	"strings"
 )
 
-func ExtractLSBInfo(infoLength int, original, result string) string {
-	originalF, _ := os.Open(original)
-	defer originalF.Close()
-
+func ExtractLSBInfo(infoLength int, result string) string {
 	resultF, _ := os.Open(result)
 	defer resultF.Close()
-
-	originalImg, _, err := image.Decode(originalF)
-	if err != nil {
-		log.Fatalln(err)
-	}
 
 	resultImg, _, err := image.Decode(resultF)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	width, height := originalImg.Bounds().Dx(), originalImg.Bounds().Dy()
+	width, height := resultImg.Bounds().Dx(), resultImg.Bounds().Dy()
 
 	pc := NewPixelColorsFromImage(resultImg, width, height)
 	bs := extractSecretInfoBitString(infoLength*16, pc)

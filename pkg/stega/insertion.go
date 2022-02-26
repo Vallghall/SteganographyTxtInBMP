@@ -15,7 +15,7 @@ func init() {
 }
 
 type PixelColors struct {
-	Colors []color.NRGBA
+	Colors []color.RGBA
 }
 
 func (pc *PixelColors) NullifyLSB(bits int) {
@@ -57,7 +57,7 @@ func HideInfo(originalFileName, secretText, result string) {
 		n++
 	}
 
-	out := image.NewNRGBA(image.Rectangle{
+	out := image.NewRGBA(image.Rectangle{
 		Min: image.Point{},
 		Max: image.Point{X: width, Y: height},
 	})
@@ -78,7 +78,7 @@ func NewPixelColorsFromImage(img image.Image, width, height int) (pc PixelColors
 	for i := 0; i < width; i++ {
 		for j := 0; j < height; j++ {
 			r, g, b, a := img.At(i, j).RGBA()
-			pc.Colors = append(pc.Colors, color.NRGBA{
+			pc.Colors = append(pc.Colors, color.RGBA{
 				R: uint8(r),
 				G: uint8(g),
 				B: uint8(b),

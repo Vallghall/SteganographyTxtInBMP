@@ -14,7 +14,7 @@ const (
 func main() {
 	stega.HideInfo(originalFileName, secretText, result)
 
-	secretGot := stega.ExtractLSBInfo(len(secretText), originalFileName, result)
+	secretGot := stega.ExtractLSBInfo(len(secretText), result)
 	fmt.Println(secretGot)
 
 	mse, nmse := stega.EvalQuality(originalFileName, result)
