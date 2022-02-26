@@ -1,8 +1,10 @@
 package stega
 
 import (
+	"fmt"
 	"image"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -33,9 +35,12 @@ func ExtractLSBInfo(infoLength int, original, result string) string {
 	}
 
 	pc1 := NewPixelColorsFromImage(originalImg, oWidth, oHeight)
-	pc1.NullifyLSB(infoLength * 16)
 	pc2 := NewPixelColorsFromImage(resultImg, rWidth, rHeight)
 
+	fmt.Printf("СКО: %.04f\n", MeanSquareError(pc1, pc2))
+	fmt.Printf("НСКО: %f\n", NormalizedMeanSquareError(pc1, pc2))
+
+	pc1.NullifyLSB(infoLength * 16)
 	bs := extractSecretInfoBitString(infoLength*16, pc1, pc2)
 
 	return extractInfo(bs)
@@ -64,4 +69,29 @@ func extractInfo(bitString string) string {
 	}
 
 	return sb.String()
+}
+
+func MeanSquareError(pc1, pc2 PixelColors) float64 {
+	var up, length int
+
+	for i, origin := range pc1.Colors {
+		length++
+		a := int(origin.B)
+		b := int(pc2.Colors[i].B)
+		up += (a - b) * (a - b)
+	}
+
+	return math.Sqrt(float64(up) / float64(length*3))
+}
+
+func NormalizedMeanSquareError(pc1, pc2 PixelColors) float64 {
+	var up float64
+	var length int
+
+	for _, origin := range pc2.Colors {
+		length++
+		up += math.Pow(float64(origin.B), 2)
+	}
+
+	return MeanSquareError(pc1, pc2) / math.Sqrt(up/float64(length*3))
 }
