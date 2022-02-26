@@ -7,12 +7,16 @@ import (
 
 const (
 	originalFileName = "oberon.bmp"
-	secretText       = "Vali"
+	secretText       = "Гусев Роман Михайлович"
 	result           = "encoded.bmp"
 )
 
 func main() {
 	stega.HideInfo(originalFileName, secretText, result)
 
-	fmt.Println(stega.ExtractLSBInfo(len(secretText), originalFileName, result))
+	secretGot := stega.ExtractLSBInfo(len(secretText), originalFileName, result)
+	fmt.Println(secretGot)
+
+	mse, nmse := stega.EvalQuality(originalFileName, result)
+	fmt.Printf("СКО: %.04f\nНСКО: %f\n", mse, nmse)
 }

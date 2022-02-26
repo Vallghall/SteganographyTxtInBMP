@@ -38,8 +38,8 @@ func HideInfo(originalFileName, secretText, result string) {
 
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 
-	prepImg := NewPixelColorsFromImage(img, width, height)
-	prepImg.NullifyLSB(len(secretText) * 16)
+	pc := NewPixelColorsFromImage(img, width, height)
+	pc.NullifyLSB(len(secretText) * 16)
 
 	sb := strings.Builder{}
 	for _, b := range []rune(secretText) {
@@ -52,7 +52,7 @@ func HideInfo(originalFileName, secretText, result string) {
 			break
 		}
 		if sym == '1' {
-			prepImg.Colors[n].B += 1
+			pc.Colors[n].B += 1
 		}
 		n++
 	}
@@ -64,7 +64,7 @@ func HideInfo(originalFileName, secretText, result string) {
 	var k int
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			out.Set(x, y, prepImg.Colors[k])
+			out.Set(x, y, pc.Colors[k])
 			k++
 		}
 	}
