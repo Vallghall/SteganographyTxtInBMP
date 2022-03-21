@@ -38,7 +38,17 @@ func HideInfo(originalFileName, secretText, result string) {
 
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 
+	if len(secretText)*16 > width*height*3 {
+		log.Fatalln("Встраивание ЦВЗ в стеганоконтейнер невозможно")
+	}
+
 	pc := NewPixelColorsFromImage(img, width, height)
+
+	fmt.Println("Значения синей цветовой компоненты в диапазоне длины сообщения до встраивания")
+	for i := 0; i <= len(secretText); i++ {
+		fmt.Printf("%v ", pc.Colors[i].B)
+	}
+	fmt.Println()
 	pc.NullifyLSB(len(secretText) * 16)
 
 	sb := strings.Builder{}
@@ -48,25 +58,35 @@ func HideInfo(originalFileName, secretText, result string) {
 
 	var n int
 	for _, sym := range sb.String() {
+
 		if n == len(secretText)*16 {
 			break
 		}
 		if sym == '1' {
-			pc.Colors[n].B += 1
+			pc.Colors[n].B++
 		}
 		n++
 	}
-
+	fmt.Println("Значения синей цветовой компоненты в диапазоне длины сообщения после встраивания")
+	for i := 0; i <= len(secretText); i++ {
+		fmt.Printf("%v ", pc.Colors[i].B)
+	}
+	fmt.Println()
 	out := image.NewRGBA(image.Rectangle{
 		Min: image.Point{},
 		Max: image.Point{X: width, Y: height},
 	})
+
+	fo, _ := os.Create("after.txt")
+	defer fo.Close()
 	var k int
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
 			out.Set(x, y, pc.Colors[k])
+			fmt.Fprintf(fo, "Pixel(%d,%d)={%d,%d,%d}", x, y, pc.Colors[k].R, pc.Colors[k].G, pc.Colors[k].B)
 			k++
 		}
+		fmt.Fprintln(fo)
 	}
 
 	outf, _ := os.Create(result)
@@ -75,6 +95,8 @@ func HideInfo(originalFileName, secretText, result string) {
 }
 
 func NewPixelColorsFromImage(img image.Image, width, height int) (pc PixelColors) {
+	f, _ := os.Create("before.txt")
+	defer f.Close()
 	for i := 0; i < width; i++ {
 		for j := 0; j < height; j++ {
 			r, g, b, a := img.At(i, j).RGBA()
@@ -84,7 +106,9 @@ func NewPixelColorsFromImage(img image.Image, width, height int) (pc PixelColors
 				B: uint8(b),
 				A: uint8(a),
 			})
+			fmt.Fprintf(f, "Pixel(%d,%d)={%d,%d,%d}", i, j, uint8(r), uint8(g), uint8(b))
 		}
+		fmt.Fprintln(f)
 	}
 	return
 }

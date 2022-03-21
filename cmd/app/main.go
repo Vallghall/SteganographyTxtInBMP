@@ -17,8 +17,8 @@ func main() {
 
 	stega.HideInfo(originalFileName, string(secretText), result)
 
-	secretGot := stega.ExtractLSBInfo(len(secretText), result)
-	fmt.Printf("Извлеченное сообщение: %s\n", secretGot)
+	//secretGot := stega.ExtractLSBInfo(len(secretText), result)
+	//fmt.Printf("Извлеченное сообщение: %s\n", secretGot)
 
 	mse, nmse := stega.EvalQuality(originalFileName, result)
 	fmt.Printf("СКО: %.04f\nНСКО: %f\n", mse, nmse)
