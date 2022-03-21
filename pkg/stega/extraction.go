@@ -6,9 +6,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
-func ExtractLSBInfo(infoLength int, result string) string {
+func ExtractLSBInfo(info string, result string) string {
 	resultF, _ := os.Open(result)
 	defer resultF.Close()
 
@@ -20,7 +21,7 @@ func ExtractLSBInfo(infoLength int, result string) string {
 	width, height := resultImg.Bounds().Dx(), resultImg.Bounds().Dy()
 
 	pc := NewPixelColorsFromImage(resultImg, width, height)
-	bs := extractSecretInfoBitString(infoLength*16, pc)
+	bs := extractSecretInfoBitString(utf8.RuneCountInString(info)*16, pc)
 
 	return extractInfo(bs)
 }

@@ -29,30 +29,34 @@ func EvalQuality(original, result string) (float64, float64) {
 	pc1 := NewPixelColorsFromImage(originalImg, width, height)
 	pc2 := NewPixelColorsFromImage(resultImg, width, height)
 
-	return MeanSquareError(pc1, pc2), NormalizedMeanSquareError(pc1, pc2)
+	return MeanSquareError(pc1, pc2, width, height), NormalizedMeanSquareError(pc1, pc2, width, height)
 }
 
-func MeanSquareError(pc1, pc2 PixelColors) float64 {
-	var up, length int
+func MeanSquareError(pc1, pc2 PixelColors, x, y int) float64 {
+	var length int
+	var up float64
 
 	for i, origin := range pc1.Colors {
 		length++
-		a := int(origin.B)
-		b := int(pc2.Colors[i].B)
-		up += (a - b) * (a - b)
+		c := int(origin.B)
+		s := int(pc2.Colors[i].B)
+		up += math.Pow(float64(c-s), 2)
 	}
 
-	return math.Sqrt(float64(up) / float64(length*3))
+	return math.Sqrt(up) / float64(x*y)
 }
 
-func NormalizedMeanSquareError(pc1, pc2 PixelColors) float64 {
-	var up float64
+func NormalizedMeanSquareError(pc1, pc2 PixelColors, x, y int) float64 {
+	var up, div float64
 	var length int
 
-	for _, origin := range pc2.Colors {
+	for i, origin := range pc1.Colors {
 		length++
-		up += math.Pow(float64(origin.B), 2)
+		c := int(origin.B)
+		s := int(pc2.Colors[i].B)
+		up += math.Pow(float64(c-s), 2)
+		div += math.Pow(float64(c), 2)
 	}
 
-	return MeanSquareError(pc1, pc2) / math.Sqrt(up/float64(length*3))
+	return up / div
 }

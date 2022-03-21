@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 func init() {
@@ -38,21 +39,21 @@ func HideInfo(originalFileName, secretText, result string) {
 
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
 
-	if len(secretText)*16 > width*height*3 {
+	if utf8.RuneCountInString(secretText)*16 > width*height {
 		log.Fatalln("Встраивание ЦВЗ в стеганоконтейнер невозможно")
 	}
 
 	pc := NewPixelColorsFromImage(img, width, height)
 
-	fmt.Println("Значения синих цветовых компонент в диапазоне длины сообщения до встраивания")
+	fmt.Println("Значения компонент синего цвета фрагмента изображения до встраивания:")
 	for i := 0; i <= 8; i++ {
 		for j := 0; j < 16; j++ {
 			fmt.Printf("%.08b ", pc.Colors[i*width+j].B)
 		}
-		fmt.Println()
+		fmt.Println("")
 	}
 
-	pc.NullifyLSB(len(secretText) * 16)
+	pc.NullifyLSB(utf8.RuneCountInString(secretText) * 16)
 
 	sb := strings.Builder{}
 	for _, b := range []rune(secretText) {
@@ -62,7 +63,7 @@ func HideInfo(originalFileName, secretText, result string) {
 	var n int
 	for _, sym := range sb.String() {
 
-		if n == len(secretText)*16 {
+		if n == utf8.RuneCountInString(secretText)*16 {
 			break
 		}
 		if sym == '1' {
@@ -70,12 +71,12 @@ func HideInfo(originalFileName, secretText, result string) {
 		}
 		n++
 	}
-	fmt.Println("Значения синей цветовой компоненты в диапазоне длины сообщения после встраивания")
+	fmt.Println("Значения компоненты синего цвета фрагмента изображения после встраивания:")
 	for i := 0; i <= 8; i++ {
 		for j := 0; j < 16; j++ {
 			fmt.Printf("%.08b ", pc.Colors[i*width+j].B)
 		}
-		fmt.Println()
+		fmt.Println("")
 	}
 
 	out := image.NewRGBA(image.Rectangle{
